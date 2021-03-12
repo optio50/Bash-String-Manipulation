@@ -1,0 +1,49 @@
+#!/usr/bin/bash
+
+# Text Colors
+BoRed=$(tput bold; tput setaf 1)
+Bogreen=$(tput bold; tput setaf 28)
+green=$(tput setaf 28)
+red=$(tput setaf 1)
+white=$(tput setaf 15)
+blue=$(tput setaf 21)
+pink=$(tput setaf 200)
+orange=$(tput setaf 166)
+Lorange=$(tput setaf 215)
+reset=$(tput sgr0) #  Reset text attributes to normal
+
+dir="${1}"
+
+mapfile -t -d '' -O 1 < <(find "${dir}" -name "*.mkv" -print0) files
+
+# Variables
+
+Counter=1
+Total="${#files[@]}"
+
+
+printf "%b" "${orange}"
+cat <<"EOF"
+
+# String Manipulation
+Counter			=		"${Counter}"
+Original DIR		=		"${files[$Counter]%/*}"
+Filename		=		"${files[$Counter]}"
+Extension		=		"${files[$Counter]##*.}"
+File +ext		=		"${files[$Counter]%mkv}"ext
+File -ext		=		"${files[$Counter]%mkv}"
+EOF
+printf "%b" "${reset}"
+while [[ "${Counter}" -le "${Total}" ]]; do
+printf "%b\n\n"
+printf "%b\n" "${red}" "File ${Counter} of ${Total} ${white}----> ${blue}  $(basename "${files[$Counter]}")\n"
+printf "%b" "${pink}""Counter			=		" "${Counter}\n"
+printf "%b" "${white}""Original DIR		=		""${files[$Counter]%/*}""\n"
+printf "%b" "${red}""Filename		=		" "${files[$Counter]}\n"
+printf "%b" "${Lorange}""Extension		=		" "${files[$Counter]##*.}\n"
+printf "%b" "${orange}""File -ext		=		" "${files[$Counter]%mkv}\n"
+printf "%b" "${green}" "File +ext		=		" "${files[$Counter]%mkv}ext"
+#printf "%b\n\n"
+(( Counter ++ ))
+done
+printf "%b\n\n"
