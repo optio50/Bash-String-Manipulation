@@ -1,4 +1,5 @@
 # Bash-String-Manipulation
+![ScreenShot](https://github.com/optio50/Bash-String-Manipulation/blob/master/String-Manipulation.png?raw=true|alt=octocat)
 I was interested in finding all the video files in a directory and converting them to the mkv container.
 the converting program requires an in and out file. I wanted the filename to be the same minus the extension.
 I also wanted the conversion to take place in the existing filename directory. After that they would have custom tags inserted.
