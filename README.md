@@ -10,14 +10,3 @@ a few characters added to the filename (String-Manipulation) and its much cleane
 
 This file loops through your directory of choice and performs the String Manipulation printed to stdout.
 No changes are made to your files.
-
- Create an array named "files" to hold the filenames we will loop through
-mapfile -t -d '' -O 1 < <(find "${dir}" -name "*.${ext}" -print0) files
-
-String Manipulation
-Counter			=		"${Counter}"
-Filename DIR		=		"${files[$Counter]%/*}/"
-Filename		=		"${files[$Counter]##*/}"
-Extension		=		"${files[$Counter]##*.}"
-File -ext		=		"${files[$Counter]%.*}"
-File +ext		=		"${files[$Counter]%.*}"ext
