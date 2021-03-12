@@ -12,38 +12,96 @@ orange=$(tput setaf 166)
 Lorange=$(tput setaf 215)
 reset=$(tput sgr0) #  Reset text attributes to normal
 
+# The argument (Directory or file) passed to the script
 dir="${1}"
 
-mapfile -t -d '' -O 1 < <(find "${dir}" -name "*.mkv" -print0) files
+# Get the extension of interest
+File_Type()
+{
+printf "%b\n" ${red}
+printf "%b\n" " Operating in Batch Directory mode.\n
+${pink} 
+What type of file extension are you using? Example..... mkv mp4 avi txt log.......etc"
+printf "%b\n" ${reset}
+read -r -p "File Type?   " ext 
+tput cuu 3
+tput dl 3
+}
 
-# Variables
+# Argument must be a valid file or directory
+Arg_Invalid()
+{
+printf "%b\n" "Argument is not valid";
+printf "%b\n" ${BoRed} "Error:"
+printf "%b" ${BoRed} ${0##*/}" requires a valid directory or file as an argument \n"
+printf "%b\n" "-----------------------------------------------------------------------------------"
+printf "%b" ${reset} "Example:""\n"
+printf "%b" ${red} "Batch Directory Mode\n"
+printf "%b" ${green} ${0##*/} " '/media/POOL/TV/Battlestar Galactica (2003)'\n"
+printf "%b" ${red} "Single File Mode\n"
+printf "%b" ${green} ${0##*/}  " '/media/POOL/TV/Battlestar Galactica (2003)/Season 2/Battlestar Galactica (2003) - S02E04 - Resistance.mkv\n\n"
+}
 
-Counter=1
-Total="${#files[@]}"
-
-
+# Print to screen as a here doc 
+Strings()
+{
 printf "%b" "${orange}"
 cat <<"EOF"
 
+# Create an array named "files" to hold the filenames we will loop through
+mapfile -t -d '' -O 1 < <(find "${dir}" -name "*.${ext}" -print0) files
+
 # String Manipulation
 Counter			=		"${Counter}"
-Original DIR		=		"${files[$Counter]%/*}"
-Filename		=		"${files[$Counter]}"
+Filename DIR		=		"${files[$Counter]%/*}/"
+Filename		=		"${files[$Counter]##*/}"
 Extension		=		"${files[$Counter]##*.}"
-File +ext		=		"${files[$Counter]%mkv}"ext
-File -ext		=		"${files[$Counter]%mkv}"
+File -ext		=		"${files[$Counter]%.*}"
+File +ext		=		"${files[$Counter]%.*}"ext
 EOF
 printf "%b" "${reset}"
+}
+
+# Check to see if argument is a Directory or File and create an array
+if [ -d "${dir}" ]; then
+   File_Type
+mapfile -t -d '' -O 1 < <(find "${dir}" -name  "*.${ext}" -print0) files
+elif [ -f "${dir}" ]; then
+        printf "%b\n" ${red} "Single file mode";
+        # Continue to utilize an array even though we only have one file
+        mapfile -t -O 1 < <(find "${dir}" -print0 ) files        
+else
+Arg_Invalid
+exit 1
+fi
+
+# Variables
+
+# Initialize the counter
+Counter=1
+
+# Get the total amount of files in the array
+Total="${#files[@]}"
+
+# Call the here doc
+Strings
+
+# Start the loop
 while [[ "${Counter}" -le "${Total}" ]]; do
 printf "%b\n\n"
-printf "%b\n" "${red}" "File ${Counter} of ${Total} ${white}----> ${blue}  $(basename "${files[$Counter]}")\n"
+printf "%b\n" "${red}" "File ${Counter} of ${Total} ${white}----> ${blue}  ""${files[$Counter]##*/}\n"
 printf "%b" "${pink}""Counter			=		" "${Counter}\n"
-printf "%b" "${white}""Original DIR		=		""${files[$Counter]%/*}""\n"
-printf "%b" "${red}""Filename		=		" "${files[$Counter]}\n"
+printf "%b" "${white}""Filename DIR		=		""${files[$Counter]%/*}/""\n"
+printf "%b" "${red}""Filename		=		" "${files[$Counter]##*/}\n"
 printf "%b" "${Lorange}""Extension		=		" "${files[$Counter]##*.}\n"
-printf "%b" "${orange}""File -ext		=		" "${files[$Counter]%mkv}\n"
-printf "%b" "${green}" "File +ext		=		" "${files[$Counter]%mkv}ext"
-#printf "%b\n\n"
+printf "%b" "${orange}""File -ext		=		" "${files[$Counter]%.*}.\n"
+printf "%b" "${green}" "File +ext		=		" "${files[$Counter]%.*}.ext"
 (( Counter ++ ))
-done
+done # | more
 printf "%b\n\n"
+
+# Call the here doc again in case the output was very long
+Strings
+printf "%b\n\n"
+
+
